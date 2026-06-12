@@ -1,8 +1,8 @@
 //! PhenoTesting - Testing Utilities
 
 use anyhow::Result;
-use wiremock::{MockServer, Mock, ResponseTemplate};
 use wiremock::matchers::{method, path};
+use wiremock::{Mock, MockServer, ResponseTemplate};
 
 /// Mock HTTP server for testing
 pub struct MockHttpServer {
@@ -38,14 +38,9 @@ impl MockHttpServer {
 
 /// Generate random test data
 pub fn random_string(len: usize) -> String {
-    use rand::distributions::Alphanumeric;
-    use rand::Rng;
-    
-    rand::thread_rng()
-        .sample_iter(&Alphanumeric)
-        .take(len)
-        .map(char::from)
-        .collect()
+    use rand::distr::{Alphanumeric, SampleString};
+
+    Alphanumeric.sample_string(&mut rand::rng(), len)
 }
 
 /// Temp directory for tests

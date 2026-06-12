@@ -1,11 +1,11 @@
 //! PhenoShell - CLI Shell Framework
 
-use std::sync::{Arc, Mutex};
 use anyhow::Result;
-use std::pin::Pin;
 use std::future::Future;
-use tokio::io::{AsyncWriteExt, AsyncBufReadExt};
+use std::pin::Pin;
+use std::sync::{Arc, Mutex};
 use tokio::io::BufReader;
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt};
 
 /// Shell state
 pub struct Shell<S: ShellState = InMemoryShellState> {
@@ -32,19 +32,19 @@ impl Shell {
 
     pub async fn run(&self) -> Result<()> {
         println!("{} shell v{}", self.name, env!("CARGO_PKG_VERSION"));
-        
+
         let stdin = BufReader::new(tokio::io::stdin());
         let mut lines = stdin.lines();
         let mut stdout = tokio::io::stdout();
-        
+
         while let Ok(Some(line)) = lines.next_line().await {
             let line = line.trim();
             if line.is_empty() {
                 continue;
             }
-            
+
             self.history.lock().unwrap().push(line.to_string());
-            
+
             match self.execute_line(line).await {
                 Ok(Some(output)) => {
                     stdout.write_all(output.as_bytes()).await?;
@@ -52,11 +52,13 @@ impl Shell {
                 }
                 Ok(None) => {}
                 Err(e) => {
-                    stdout.write_all(format!("Error: {}\n", e).as_bytes()).await?;
+                    stdout
+                        .write_all(format!("Error: {}\n", e).as_bytes())
+                        .await?;
                 }
             }
         }
-        
+
         Ok(())
     }
 
@@ -85,7 +87,7 @@ impl Shell {
         text.push_str("  exit, quit   - Exit the shell\n");
         text.push_str("  help         - Show this help\n");
         text.push_str("  history      - Show command history\n");
-        
+
         for cmd in &self.commands {
             text.push_str(&format!("  {:15} - {}\n", cmd.name, cmd.description));
         }
@@ -98,7 +100,8 @@ impl Shell {
 pub struct CommandDef {
     pub name: &'static str,
     pub description: &'static str,
-    pub handler: fn(&[&str]) -> Pin<Box<dyn Future<Output = Result<Option<String>, ShellError>> + Send>>,
+    pub handler:
+        fn(&[&str]) -> Pin<Box<dyn Future<Output = Result<Option<String>, ShellError>> + Send>>,
 }
 
 /// Shell state trait
@@ -114,7 +117,9 @@ pub struct InMemoryShellState {
 
 impl InMemoryShellState {
     pub fn new() -> Self {
-        Self { data: std::collections::HashMap::new() }
+        Self {
+            data: std::collections::HashMap::new(),
+        }
     }
 }
 

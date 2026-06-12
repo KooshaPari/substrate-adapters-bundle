@@ -22,8 +22,8 @@ cryptographic operations, network utilities, and testing helpers.
 | FR | Test File | Test Name | Status |
 |----|-----------|-----------|--------|
 | FR-001 | `crates/pheno-shell/src/lib.rs` | not yet mapped | Pending |
-| FR-002 | `crates/pheno-fs/src/lib.rs` | not yet mapped | Pending |
-| FR-003 | `crates/pheno-crypto/src/lib.rs` | not yet mapped | Pending |
+| FR-002 | `crates/pheno-fs/src/lib.rs` | `atomic_write_replaces_contents_and_leaves_no_temp_file`, `compute_hash_returns_sha256_hex_digest` | Covered |
+| FR-003 | `crates/pheno-crypto/src/lib.rs` | `hmac_sha256_matches_known_vector`, `base64_decode_rejects_invalid_input`, `random_bytes_returns_requested_length` | Covered |
 | FR-004 | `crates/pheno-net/src/lib.rs` | not yet mapped | Pending |
 | FR-005 | `crates/pheno-testing/src/lib.rs` | not yet mapped | Pending |
 | FR-006 | `tests/smoke_test.rs` | `smoke_test_loads` | Covered |
