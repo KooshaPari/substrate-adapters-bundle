@@ -31,6 +31,24 @@
 
 # PhenoUtils
 
+## Quickstart
+
+> Foundational Rust utility crates for the Phenotype ecosystem: CLI shells, async filesystem, cryptography
+
+```bash
+# Clone, build, test
+git clone https://github.com/KooshaPari/phenoUtils.git
+cd phenoUtils
+```
+
+```rust
+// Add to Cargo.toml:
+// phenoutils = "<version>"
+```
+
+See [SPEC.md](SPEC.md) for the full specification and [llms.txt](llms.txt) for machine-readable metadata.
+
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![FR Coverage](https://github.com/KooshaPari/phenoUtils/actions/workflows/fr-coverage.yml/badge.svg)](https://github.com/KooshaPari/phenoUtils/actions/workflows/fr-coverage.yml)
 [![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org)
