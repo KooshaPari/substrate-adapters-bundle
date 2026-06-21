@@ -1,0 +1,29 @@
+<!--
+  llms.txt for pheno-context — v8 governance template (ADR-042).
+  Spec: https://llmstxt.org/  ("robots.txt for LLMs").
+  v8 supersedes the v7 pheno-flake refresh (T15.5) with the full 7-file meta-bundle.
+-->
+
+# pheno-context
+
+> Canonical request context for the pheno-* fleet. Builder, header extraction (X-Request-ID / X-Trace-ID / X-Span-ID / X-User-ID / X-Org-ID), and an extensible `metadata: HashMap<String, String>` bag. Pure, single-crate Rust library — no async runtime, no I/O, no FFI.
+
+## Documentation
+
+- [README.md](README.md): quickstart, install, when to use, when NOT to use (this crate is header-shape stable, do not add async / I/O / FFI dependencies).
+- [AGENTS.md](AGENTS.md): project overview, conventions, governance for AI agents. Cites ADR-042 (substrate quality bar) and ADR-023 (substrate placement).
+- [SPEC.md](SPEC.md): canonical specification (what / why / how / interface / status / out-of-scope; per ADR-042, 1-page max).
+- [WORKLOG.md](WORKLOG.md): change history (ADR-025 v2.1 schema, 11 columns, includes `device:` field per ADR-030).
+- [CHANGELOG.md](CHANGELOG.md): release notes, semver, breaking changes. Keep-a-Changelog 1.1.0.
+- [CONTRIBUTING.md](CONTRIBUTING.md): branching, commit, PR, review, testing, release process.
+
+## Optional
+
+- [LICENSE-MIT](LICENSE-MIT): MIT license text.
+- [LICENSE-APACHE](LICENSE-APACHE): Apache 2.0 license text.
+- [STATUS.md](STATUS.md): current state dashboard — 71-pillar L1-L71 scorecard (ADR-024) + Factory AI readiness (ADR-026).
+- [findings/71-pillar-2026-06-17-schema.md](https://github.com/KooshaPari/phenotype-apps/blob/main/findings/71-pillar-2026-06-17-schema.md): audit framework — 9 domains, 71 pillars, scoring rubric.
+- [pheno-worklog-schema/SPEC-v2.1.md](https://github.com/KooshaPari/pheno-worklog-schema/blob/main/SPEC-v2.1.md): WORKLOG.md v2.1 schema spec.
+- [examples/quickstart.rs](examples/quickstart.rs): end-to-end `Context` + `ContextBuilder` usage.
+- [tests/lib_test.rs](tests/lib_test.rs): 5 unit tests for builder, headers, missing-required, clone, display.
+- [tests/otlp_smoke.rs](tests/otlp_smoke.rs): OTLP smoke test (gated behind `--features tracing`).
