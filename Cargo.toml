@@ -1,0 +1,60 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/engine-agentapi",
+    "crates/engine-claude",
+    "crates/engine-codex",
+    "crates/engine-forge",
+    "crates/omniroute-adapter",
+    "crates/cliproxy-adapter",
+    "crates/context-budget",
+    "crates/substrate-trace",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/KooshaPari/substrate-adapters-bundle"
+homepage = "https://github.com/KooshaPari/substrate"
+documentation = "https://docs.rs/substrate"
+description = "Standalone substrate adapter crates for OSS consumption"
+authors = ["KooshaPari <kooshapari@gmail.com>"]
+rust-version = "1.74"
+
+[workspace.dependencies]
+# substrate-core from the main KooshaPari/substrate workspace
+substrate-core = { path = "../substrate/crates/substrate-core" }
+substrate-trace = { path = "../substrate/crates/substrate-trace" }
+
+# adapter crates (path deps pointing back at the canonical substrate workspace)
+engine-agentapi = { path = "../substrate/crates/engine-agentapi" }
+engine-claude   = { path = "../substrate/crates/engine-claude" }
+engine-codex    = { path = "../substrate/crates/engine-codex" }
+engine-forge    = { path = "../substrate/crates/engine-forge" }
+omniroute-adapter = { path = "../substrate/crates/omniroute-adapter" }
+cliproxy-adapter  = { path = "../substrate/crates/cliproxy-adapter" }
+context-budget    = { path = "../substrate/crates/context-budget" }
+
+# shared ecosystem crates (OSS consumption surface)
+phenotype-router = { git = "https://github.com/KooshaPari/phenotype-router.git" }
+
+# Rust async ecosystem
+async-trait = "0.1"
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "time", "sync", "net", "io-util"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "multipart"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+futures-util = "0.3"
+parking_lot = "0.12"
+tracing = "0.1"
+chrono = { version = "0.4", default-features = false, features = ["clock"] }
+uuid = { version = "1", features = ["v4", "serde"] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+opt-level = 3
+
+[profile.dev]
+debug = 1

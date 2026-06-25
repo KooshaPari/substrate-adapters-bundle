@@ -1,0 +1,13 @@
+[package]
+name.workspace        = true
+version.workspace     = true
+edition.workspace     = true
+license.workspace     = true
+repository.workspace  = true
+homepage.workspace    = true
+documentation.workspace = true
+description           = "Shim re-export of substrate::omniroute-adapter for the adapters bundle"
+publish               = false
+
+[dependencies]
+omniroute-adapter = { workspace = true }
