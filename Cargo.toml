@@ -21,3 +21,11 @@ tracing = "0.1"
 [dev-dependencies]
 tempfile = "3"
 tokio = { version = "1", features = ["rt", "macros", "time"] }
+
+[[test]]
+name = "integration_basic"
+path = "tests/integration_basic.rs"
+
+[[test]]
+name = "integration_file"
+path = "tests/integration_file.rs"
