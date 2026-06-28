@@ -7,6 +7,9 @@
 
 #![warn(missing_docs)]
 
+#[cfg(feature = "oidc")]
+pub mod oidc;
+
 use std::collections::HashMap;
 use std::fmt;
 

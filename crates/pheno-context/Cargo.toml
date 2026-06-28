@@ -12,6 +12,10 @@ rust-version.workspace = true
 name = "pheno_context"
 path = "src/lib.rs"
 
+[features]
+default = []
+oidc = []
+
 [dependencies]
 thiserror = { workspace = true }
 http = "1.1"
