@@ -1,16 +1,25 @@
-//! `odin.nvms` manifest schema — Rust types + validator for v0.1.
+//! `odin.nvms` manifest schema — Rust types + validator for v0.2.
 //!
 //! The schema is the single source of truth for the manifest format.
 //! Consuming repos (BytePort, OmniRoute, NanoVMS/PhenoCompose) validate
 //! manifests against this crate at their respective trust boundaries.
+//!
+//! Two surfaces:
+//!
+//! - [`validate`] — parse-and-validate a JSON manifest string.
+//! - [`schema_json`] — emit the canonical JSON Schema (Draft 2020-12)
+//!   derived from the Rust types via `schemars`. Ship the schema
+//!   artifact to non-Rust consumers (BytePort Go, OmniRoute TS) so
+//!   they validate against the same shape.
 
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
 
 /// Errors produced by [`validate`].
 #[derive(Debug, Error)]
 pub enum ManifestError {
-    /// The input could not be parsed as JSON, or did not match the v0.1
+    /// The input could not be parsed as JSON, or did not match the v0.2
     /// schema shape (`deny_unknown_fields` is enabled).
     #[error("manifest JSON parse error: {0}")]
     Parse(#[from] serde_json::Error),
@@ -20,8 +29,8 @@ pub enum ManifestError {
     Invalid(String),
 }
 
-/// Top-level manifest object. Matches the `odin.nvms` v0.1 wire format.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+/// Top-level manifest object. Matches the `odin.nvms` v0.2 wire format.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Manifest {
     /// Application identity & build configuration. Required.
@@ -48,7 +57,7 @@ pub struct Manifest {
 }
 
 /// Application identity and build configuration.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct App {
     /// Human-readable app name (project slug, portfolio display name).
@@ -70,7 +79,7 @@ pub struct App {
 }
 
 /// Infrastructure section — engine and its resource envelope.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Infra {
     /// Execution engine id (e.g. `docker`, `firecracker`, `k8s`,
@@ -83,7 +92,7 @@ pub struct Infra {
 }
 
 /// Resource envelope for the engine.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Resources {
     /// CPU request (engine-specific unit; typically millicores for
@@ -99,7 +108,7 @@ pub struct Resources {
 }
 
 /// Network section — ports and domains.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Network {
     /// Public-facing ports.
@@ -112,7 +121,7 @@ pub struct Network {
 }
 
 /// Observability section — OTel endpoint and log level.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Observability {
     /// OTLP collector endpoint (e.g. `http://otel:4317`).
@@ -125,7 +134,7 @@ pub struct Observability {
 }
 
 /// Agent section — MCP tools + A2A skills enabled for this app.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Agent {
     /// Enabled MCP tool names (e.g. `byteport_deploy`).
@@ -138,7 +147,7 @@ pub struct Agent {
 }
 
 /// Portfolio section — visibility and presentation.
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 #[serde(deny_unknown_fields)]
 pub struct Portfolio {
     /// Visibility: `public`, `unlisted`, or `private`.
@@ -158,7 +167,7 @@ pub struct Portfolio {
 /// # Errors
 ///
 /// - [`ManifestError::Parse`] if the input is not valid JSON or does not
-///   match the v0.1 schema shape (`deny_unknown_fields` is enabled).
+///   match the v0.2 schema shape (`deny_unknown_fields` is enabled).
 /// - [`ManifestError::Invalid`] if a semantic rule is violated (e.g.
 ///   `app.name` is empty).
 ///
@@ -176,7 +185,7 @@ pub struct Portfolio {
 pub fn validate(json: &str) -> Result<Manifest, ManifestError> {
     let manifest: Manifest = serde_json::from_str(json)?;
 
-    // Semantic rules (v0.1):
+    // Semantic rules (v0.2):
     if manifest.app.name.trim().is_empty() {
         return Err(ManifestError::Invalid("app.name must not be empty".into()));
     }
@@ -187,4 +196,40 @@ pub fn validate(json: &str) -> Result<Manifest, ManifestError> {
     }
 
     Ok(manifest)
+}
+
+/// Emit the canonical JSON Schema (Draft 2020-12) for `odin.nvms` v0.2,
+/// derived from the Rust types via `schemars`.
+///
+/// Use this to:
+///
+/// - Produce a stable schema artifact (`schemas/odin.nvms.schema.json`)
+///   for non-Rust consumers (BytePort Go uses `gojsonschema`, OmniRoute
+///   TS uses `ajv`).
+/// - Bootstrap editor tooling (Cue, JSON Schema LSP, IDE intellisense).
+///
+/// The returned JSON is `pretty-printed` for human inspection and
+/// committed to the workspace as a static artifact.
+///
+/// # Example
+///
+/// ```
+/// use phenotype_manifest::schema_json;
+/// let s = schema_json();
+/// let v: serde_json::Value = serde_json::from_str(&s).unwrap();
+/// assert_eq!(v["title"], "Manifest");
+/// ```
+pub fn schema_json() -> String {
+    let schema = schemars::schema_for!(Manifest);
+    serde_json::to_string_pretty(&schema).expect("schemars output is always JSON-serializable")
+}
+
+/// Same as [`schema_json`] but writes to a `Write` target.
+///
+/// Convenience for tooling that wants to stream the schema to a file or
+/// stdout without round-tripping through a `String`.
+pub fn write_schema_json<W: std::io::Write>(mut out: W) -> std::io::Result<()> {
+    let s = schema_json();
+    out.write_all(s.as_bytes())?;
+    out.write_all(b"\n")
 }
