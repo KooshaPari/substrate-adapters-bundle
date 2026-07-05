@@ -17,6 +17,7 @@ dependency without dragging the rest of this workspace along.
 | Crate | Purpose | Adopted by |
 |---|---|---|
 | `phenotype-manifest` | `odin.nvms` v0.2 schema + validator + JSON Schema emission (Rust → Draft 7 / 2020-12) | BytePort, OmniRoute, NanoVMS |
+| `phenotype-port-adapter-shim` | v0.3 `PortAdapter` + `NvmsAdapter` traits + value types | BytePort, NanoVMS, OmniRoute |
 
 ## Layout
 
@@ -29,25 +30,33 @@ phenotype-shared/
 ├── schemas/
 │   └── odin.nvms.schema.json   # generated artifact (cargo run --bin dump-schema)
 └── crates/
-    └── phenotype-manifest/
+    ├── phenotype-manifest/
+    │   ├── Cargo.toml
+    │   ├── src/
+    │   │   ├── lib.rs          # re-exports
+    │   │   ├── schema.rs       # types + validate() + schema_json()
+    │   │   └── bin/
+    │   │       └── dump_schema.rs  # CLI: write schema to file or stdout
+    │   ├── examples/
+    │   │   └── web-service.nvms.json
+    │   └── tests/
+    │       ├── validate.rs        # 4 integration tests
+    │       └── schema_validation.rs # 5 jsonschema-based tests
+    └── phenotype-port-adapter-shim/
         ├── Cargo.toml
         ├── src/
-        │   ├── lib.rs          # re-exports
-        │   ├── schema.rs       # types + validate() + schema_json()
-        │   └── bin/
-        │       └── dump_schema.rs  # CLI: write schema to file or stdout
-        ├── examples/
-        │   └── web-service.nvms.json
+        │   ├── lib.rs           # re-exports
+        │   ├── types.rs         # DeploymentId, PortManifest, PortStatus
+        │   └── adapter.rs       # PortAdapter + NvmsAdapter traits
         └── tests/
-            ├── validate.rs        # 4 integration tests
-            └── schema_validation.rs # 5 jsonschema-based tests
+            └── mock_adapter.rs  # MockPortAdapter + 4 integration tests
 ```
 
 ## Building & Testing
 
 ```bash
 cd phenotype-shared
-cargo test --workspace       # 9 integration tests + 3 doc-tests
+cargo test --workspace       # 14 integration tests + 5 doc-tests
 cargo build --release        # release build of lib + dump-schema binary
 cargo run --bin dump-schema  # regenerate schemas/odin.nvms.schema.json
 ```
@@ -101,7 +110,7 @@ if (!validate(manifest)) throw new Error("invalid odin.nvms");
 
 - **v0.1 ✅** `phenotype-manifest` — JSON-only, manual semantic pass. 4 integration tests green.
 - **v0.2 ✅** `phenotype-manifest` — JSON Schema emission via `schemars`; `dump-schema` CLI; jsonschema validation round-trip (9 tests + 3 doc-tests green); committed `schemas/odin.nvms.schema.json`.
-- **v0.3 (next):** `phenotype-port-adapter-shim` re-exporting `pheno-port-adapter` traits (when adoption begins).
+- **v0.3 ✅** `phenotype-port-adapter-shim` — `PortAdapter` (general deploy/status/stop/logs) + `NvmsAdapter` (MicroVM lifecycle, disk, network); `MockPortAdapter` with 4 integration tests + 1 doc-test.
 - **v0.4:** `phenotype-tracing-shim` re-exporting `pheno-tracing` OTel init.
 - **v0.5:** `phenotype-errors-shim` re-exporting `pheno-errors` error types.
 - **v0.6:** `phenotype-nvms-adapter` — Rust shim wrapping NanoVMS APIs for the BytePort control plane.
