@@ -21,3 +21,6 @@ jsonschema = { version = "0.17", features = ["draft202012"] }
 [[bin]]
 name = "dump-schema"
 path = "src/bin/dump_schema.rs"
+
+[lints]
+workspace = true
