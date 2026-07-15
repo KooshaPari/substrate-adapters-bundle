@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "crates/phenotype-manifest",
     "crates/phenotype-port-adapter-shim",
+    "crates/ffi_utils",
 ]
 
 [workspace.package]
