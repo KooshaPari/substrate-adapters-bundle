@@ -16,6 +16,7 @@ members = [
     "crates/phenoUtils/crates/pheno-net",
     "crates/phenoUtils/crates/pheno-testing",
     "crates/phenoUtils/crates/pheno-schema-port",
+    "crates/pheno-otel",
 ]
 
 [workspace.package]
