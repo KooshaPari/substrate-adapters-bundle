@@ -10,6 +10,12 @@ members = [
     "crates/context-budget",
     "crates/substrate-trace",
     "crates/pheno-context/crates/pheno-context",
+    "crates/phenoUtils/crates/pheno-shell",
+    "crates/phenoUtils/crates/pheno-fs",
+    "crates/phenoUtils/crates/pheno-crypto",
+    "crates/phenoUtils/crates/pheno-net",
+    "crates/phenoUtils/crates/pheno-testing",
+    "crates/phenoUtils/crates/pheno-schema-port",
 ]
 
 [workspace.package]
@@ -24,6 +30,8 @@ authors = ["KooshaPari <kooshapari@gmail.com>"]
 rust-version = "1.74"
 
 [workspace.dependencies]
+anyhow = "1.0"
+thiserror = "2.0"
 # substrate-core from the main KooshaPari/substrate workspace
 substrate-core = { path = "../substrate/crates/substrate-core" }
 substrate-trace = { path = "../substrate/crates/substrate-trace" }
@@ -42,7 +50,7 @@ phenotype-router = { git = "https://github.com/KooshaPari/phenotype-router.git" 
 
 # Rust async ecosystem
 async-trait = "0.1"
-tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "time", "sync", "net", "io-util"] }
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "time", "sync", "net", "io-util", "io-std"] }
 reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "multipart"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
