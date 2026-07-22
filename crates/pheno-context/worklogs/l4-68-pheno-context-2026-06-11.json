@@ -1,0 +1,71 @@
+{
+  "task_id": "L4-68",
+  "date": "2026-06-11",
+  "title": "pheno-context — canonical request context (Context, ContextBuilder, ContextError)",
+  "status": "completed",
+  "branch": "chore/l4-68-pheno-context-2026-06-11",
+  "worktree": ".worktrees/l4-68-pheno-context-2026-06-11",
+  "commit": "d8960dfd80",
+  "pushed": false,
+  "author": "forge",
+  "refs": {
+    "dag": "FLEET_100TASK_DAG_V3.md#L4-#68"
+  },
+  "summary": "Authored the pheno-context standalone crate at pheno-context/ with a canonical request Context struct, builder pattern, and header extraction. Context carries request_id, span_id, trace_id, optional user_id/org_id, and an extensible HashMap<String, String> metadata bag. ContextBuilder exposes with_request_id, with_span_id, with_trace_id, with_user_id, with_org_id, and with_metadata; build() validates required fields. Context::from_headers extracts X-Request-ID, X-Trace-ID, X-Span-ID, X-User-ID, and X-Org-ID from an http::HeaderMap. ContextError is a thiserror enum with MissingHeader(String). Context implements Clone, Debug, and Display (renders as key=value pairs). The crate is registered as a workspace member so cargo test -p pheno-context and cargo clippy -p pheno-context --all-targets -- -D warnings work from the monorepo root. All 5 tests pass.",
+  "scope": {
+    "created": [
+      "pheno-context/Cargo.toml",
+      "pheno-context/src/lib.rs"
+    ],
+    "modified": [
+      "Cargo.toml"
+    ]
+  },
+  "public_api": {
+    "pheno_context::ContextError": "thiserror enum { MissingHeader(String) } — canonical error for missing required header or builder field",
+    "pheno_context::Context": "struct { request_id, span_id, trace_id, user_id, org_id, metadata } — canonical request context; Clone, Debug, PartialEq, Display",
+    "pheno_context::ContextBuilder": "builder struct with with_request_id, with_span_id, with_trace_id, with_user_id, with_org_id, with_metadata; build() returns Result<Context, ContextError>",
+    "pheno_context::Context::new": "pub fn new() -> ContextBuilder — starts builder chain",
+    "pheno_context::Context::from_headers": "pub fn from_headers(headers: &HeaderMap) -> Result<Context, ContextError> — extracts required X-Request-ID / X-Trace-ID / X-Span-ID and optional X-User-ID / X-Org-ID"
+  },
+  "dependencies": {
+    "thiserror": "2.0 (workspace)",
+    "http": "1.1"
+  },
+  "test_results": {
+    "command": "cargo test -p pheno-context",
+    "unit": 5,
+    "integration": 0,
+    "doctest": 0,
+    "total": 5,
+    "passed": 5,
+    "failed": 0
+  },
+  "test_coverage": [
+    "pheno-context/src/lib.rs: builder_sets_all_fields (line 176) — builder chain sets all required and optional fields, metadata bag",
+    "pheno-context/src/lib.rs: from_headers_extracts_known_headers (line 198) — X-Request-ID, X-Trace-ID, X-Span-ID, X-User-ID, X-Org-ID parsed correctly",
+    "pheno-context/src/lib.rs: from_headers_missing_request_id_returns_error (line 216) — missing required header returns ContextError::MissingHeader(\"X-Request-ID\")",
+    "pheno-context/src/lib.rs: clone_preserves_all_fields (line 229) — cloned context is equal to original via PartialEq",
+    "pheno-context/src/lib.rs: display_renders_key_value_pairs (line 245) — Display output contains request_id=, span_id=, trace_id=, user_id=, org_id=, metadata= key=value segments"
+  ],
+  "verification": {
+    "cargo_test": "5/5 pass via cargo test -p pheno-context from monorepo root (worktree .worktrees/l4-68-pheno-context-2026-06-11)",
+    "cargo_clippy": "clean (no code warnings, -D warnings applied) via cargo clippy -p pheno-context --all-targets -- -D warnings from monorepo root",
+    "rust_edition": "2021",
+    "rust_msrv": "1.82 (per pheno-context/Cargo.toml)"
+  },
+  "spec_alignment": "The L4 #68 spec called for pub struct Context { request_id, span_id, trace_id, user_id, org_id, metadata }, builder pattern with with_request_id / with_user_id / with_org_id / with_metadata, Context::new() -> ContextBuilder, Context::from_headers extracting X-Request-ID / X-Trace-ID / X-Span-ID / X-User-ID / X-Org-ID, ContextError as thiserror enum with MissingHeader(String), Clone / Debug / Display, and >=5 named tests. All deliverables are present verbatim. The crate is registered in the root workspace Cargo.toml so -p commands work. The commit message matches the spec exactly.",
+  "spec_deviations": "None. All spec deliverables are present and verified.",
+  "constraints_respected": [
+    "Branch is local-only (chore/l4-68-pheno-context-2026-06-11) and NOT pushed to origin per task directive.",
+    "The crate is a standalone package (explicit versions in Cargo.toml, not workspace = true) but is listed in the root workspace members so -p commands work.",
+    "No touch of other crates or files beyond adding the workspace member entry in Cargo.toml.",
+    "All 5 canonical test names from the spec are present verbatim and pass.",
+    "cargo clippy --all-targets -- -D warnings passes with zero code warnings."
+  ],
+  "no_touch": [
+    "Other crates in the workspace",
+    "CI workflows",
+    "Documentation files (no README.md created for pheno-context per task brevity directive)"
+  ]
+}
