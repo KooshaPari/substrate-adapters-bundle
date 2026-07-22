@@ -17,6 +17,10 @@ members = [
     "crates/phenoUtils/crates/pheno-testing",
     "crates/phenoUtils/crates/pheno-schema-port",
     "crates/pheno-otel",
+    "crates/pheno-runtime-config",
+    "crates/phenotype-shared/crates/phenotype-manifest",
+    "crates/phenotype-shared/crates/phenotype-port-adapter-shim",
+    "crates/phenotype-shared/crates/ffi_utils",
 ]
 
 [workspace.package]
