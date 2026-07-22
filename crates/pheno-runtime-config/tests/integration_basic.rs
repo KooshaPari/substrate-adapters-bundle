@@ -32,26 +32,19 @@ fn concurrent_readers_no_data_race() {
     assert_eq!(counter.load(Ordering::Relaxed), READERS * ITERS);
 }
 
-#[test]
-fn watch_notifies_all_subscribers() {
+#[tokio::test]
+async fn watch_notifies_all_subscribers() {
     let r = ArcReloadable::new("init".to_string());
     let mut rx1 = r.watch();
     let mut rx2 = r.watch();
 
-    r.reload("update1".to_string()).unwrap();
     r.reload("update2".to_string()).unwrap();
 
     // Both subscribers should have seen at least the latest value
-    assert!(rx1.changed().is_ok());
-    assert!(rx2.changed().is_ok());
-    assert_eq!(*rx1.borrow(), "update1".to_string());
-    assert_eq!(*rx2.borrow(), "update1".to_string());
-
-    // Second reload
-    assert!(rx1.changed().is_ok());
-    assert!(rx2.changed().is_ok());
-    assert_eq!(*rx1.borrow(), "update2".to_string());
-    assert_eq!(*rx2.borrow(), "update2".to_string());
+    assert!(rx1.changed().await.is_ok());
+    assert!(rx2.changed().await.is_ok());
+    assert_eq!(*rx1.borrow(), std::sync::Arc::new("update2".to_string()));
+    assert_eq!(*rx2.borrow(), std::sync::Arc::new("update2".to_string()));
 }
 
 #[test]

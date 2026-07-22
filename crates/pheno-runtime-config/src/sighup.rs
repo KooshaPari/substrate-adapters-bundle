@@ -17,9 +17,8 @@ static HUP_RECEIVED: AtomicBool = AtomicBool::new(false);
 pub fn register_hup_handler() {
     // SAFETY: signal handlers are global; this is safe as long as only
     // one handler is registered. We only register once.
-    unsafe {
-        libc_signal_hup();
-    }
+    #[cfg(unix)]
+    unsafe { libc_signal_hup(); }
 }
 
 #[cfg(unix)]

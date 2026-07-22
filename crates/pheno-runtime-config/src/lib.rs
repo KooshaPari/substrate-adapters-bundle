@@ -12,20 +12,23 @@
 //!
 //! ## Quick start
 //! ```
-//! # async fn example() {
+//! # #[derive(serde::Deserialize)]
+//! # struct MyConfig { }
+//! # use pheno_runtime_config::ReloadError;
+//! # async fn example() -> Result<(), ReloadError> {
 //! use pheno_runtime_config::{Reloadable, ReloadError, file::FileConfig};
 //!
 //! // Load from a TOML file with automatic file-watcher reload
 //! let config = FileConfig::<MyConfig>::new("/etc/myapp/config.toml").await?;
 //!
 //! // Read the current value (lock-free, ~ns)
-//! let current: &MyConfig = config.current();
-//! # Ok::<_, ReloadError>(())
+//! let current: std::sync::Arc<MyConfig> = config.current();
+//! # Ok(())
 //! # }
 //! ```
 
-mod file;
-mod sighup;
+pub mod file;
+pub mod sighup;
 
 use std::sync::Arc;
 use arc_swap::ArcSwap;
@@ -85,8 +88,8 @@ impl<T: Send + Sync + 'static> ArcReloadable<T> {
 impl<T: Send + Sync + 'static> Reloadable<T> for ArcReloadable<T> {
     fn reload(&self, new: T) -> Result<(), ReloadError> {
         let arc = Arc::new(new);
-        let prev = self.current.swap(arc);
-        let _ = self.tx.send(Arc::clone(prev.as_ref()));
+        self.current.swap(Arc::clone(&arc));
+        let _ = self.tx.send(arc);
         Ok(())
     }
 
@@ -121,7 +124,7 @@ mod tests {
 
         let updated = rx.changed().await;
         assert!(updated.is_ok());
-        assert_eq!(*rx.borrow(), "world".to_string());
+        assert_eq!(*rx.borrow(), Arc::new("world".to_string()));
     }
 
     #[test]

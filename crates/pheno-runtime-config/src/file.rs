@@ -13,7 +13,7 @@ use crate::{ArcReloadable, ReloadError, Reloadable};
 
 /// A file-based reloadable configuration.
 pub struct FileConfig<T> {
-    inner: ArcReloadable<T>,
+    inner: Arc<ArcReloadable<T>>,
     path: PathBuf,
 }
 
@@ -26,7 +26,7 @@ impl<T: serde::de::DeserializeOwned + Send + Sync + 'static> FileConfig<T> {
         let path = path.into();
         let initial = Self::read_file(&path)?;
         let config = Self {
-            inner: ArcReloadable::new(initial),
+            inner: Arc::new(ArcReloadable::new(initial)),
             path,
         };
         config.start_watcher()?;
@@ -43,6 +43,7 @@ impl<T: serde::de::DeserializeOwned + Send + Sync + 'static> FileConfig<T> {
 
     fn start_watcher(&self) -> Result<(), ReloadError> {
         let path = self.path.clone();
+        let watch_path = path.clone();
         let inner = Arc::clone(&self.inner);
 
         let mut watcher = notify::recommended_watcher(move |res: Result<Event, notify::Error>| {
@@ -55,7 +56,7 @@ impl<T: serde::de::DeserializeOwned + Send + Sync + 'static> FileConfig<T> {
             }
         })?;
 
-        watcher.watch(path.parent().unwrap_or(&path), RecursiveMode::NonRecursive)?;
+        watcher.watch(watch_path.parent().unwrap_or(&watch_path), RecursiveMode::NonRecursive)?;
         // Keep watcher alive — store in self
         std::mem::forget(watcher);
         Ok(())
