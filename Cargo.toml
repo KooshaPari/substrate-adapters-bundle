@@ -9,6 +9,7 @@ members = [
     "crates/cliproxy-adapter",
     "crates/context-budget",
     "crates/substrate-trace",
+    "crates/pheno-context/crates/pheno-context",
 ]
 
 [workspace.package]

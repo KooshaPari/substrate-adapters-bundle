@@ -1,0 +1,25 @@
+[package]
+name = "pheno-context"
+description = "Canonical request context for the pheno-* fleet. Builder, header extraction, and structured metadata."
+keywords = ["context", "request", "headers", "phenotype", "tracing"]
+categories = ["web-programming", "data-structures"]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+rust-version = "1.82"
+
+[lib]
+name = "pheno_context"
+path = "src/lib.rs"
+
+[features]
+default = []
+oidc = []
+
+[dependencies]
+thiserror = "1.0"
+http = "1.1"
+
+[dev-dependencies]
+http = "1.1"
+proptest = "1"
