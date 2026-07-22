@@ -1,0 +1,31 @@
+[package]
+name = "pheno-runtime-config"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+rust-version = "1.82"
+description = "Hot-reloadable runtime configuration for the pheno-* fleet (L37). Reloadable<T> trait, notify-based file watcher, SIGHUP fallback, atomic swap."
+keywords = ["config", "hot-reload", "runtime", "phenotype", "reloadable"]
+categories = ["config", "web-programming"]
+
+[dependencies]
+notify = { version = "6", default-features = false, features = ["macos_kqueue"] }
+arc-swap = "1"
+tokio = { version = "1", features = ["sync", "rt", "macros"] }
+thiserror = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+tracing = "0.1"
+
+[dev-dependencies]
+tempfile = "3"
+tokio = { version = "1", features = ["rt", "macros", "time"] }
+
+[[test]]
+name = "integration_basic"
+path = "tests/integration_basic.rs"
+
+[[test]]
+name = "integration_file"
+path = "tests/integration_file.rs"
